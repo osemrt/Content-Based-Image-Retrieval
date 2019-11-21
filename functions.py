@@ -1,6 +1,4 @@
-import numpy as np
-import cv2 as cv
-import os
+from common import *
 
 
 # A function to get all image paths
@@ -57,3 +55,27 @@ def grayscale_histogram(grayscale):
 
     return hist
 
+
+# A function to get Local Binary Pattern of an image
+def get_lbp_image(image):
+    height, width, channel = image.shape
+    if channel > 1:
+        image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+
+    lbp_image = np.zeros_like(image)
+    neighbor = 3
+    factor = [[1, 2, 4],
+              [256, 0, 8],
+              [128, 64, 16]]
+
+    for i in range(0, height - neighbor, 1):
+        for j in range(0, width - neighbor, 1):
+            img = image[i:i + neighbor, j:j + neighbor]
+            center = img[1][1]
+
+            img = (img >= center) * 1
+            img = img * factor
+            total = np.sum(img)
+            lbp_image[i + 1][j + 1] = total
+
+    return lbp_image
