@@ -1,4 +1,5 @@
 from functions import *
+from DatasetImage import *
 
 if __name__ == '__main__':
     # Getting dataset and query path
@@ -10,33 +11,43 @@ if __name__ == '__main__':
 
     # Creating dataset
     dataset = []
-    # TODO: Change the upper limit to files.size
     for i in range(0, files.size, 1):
+        print("{}...".format(i+1))
         dataset_image = DatasetImage(files[i])
-        print("{}: {} is added to dataset...".format(i, dataset_image.get_name()))
         dataset.append(dataset_image)
-        # dataset[i].show_image()
-        # dataset[i].show_lbp_image()
+        print("{} is added to dataset...\n".format(dataset_image.get_name()))
 
     while 1:
+
+        # Getting query image path from the user
         query_image_path = get_query_image_path_from_user()
 
+        # checking whether the given path is valid or not
         if os.path.exists(query_image_path) and os.path.isfile(query_image_path):
 
-            print(query_image_path)
             # Creating dataset-image instance for query image
-            query = DatasetImage(query_image_path)
-            query.show_image()
+            query_image = DatasetImage(query_image_path)
 
-            # Finding the most similar image
-            index = find_similar_image(dataset, files.size, query)
+            # Finding the most similar images
+            similar_rgb_indexes = find_similar_rgb_images(dataset, files.size, query_image)
+            similar_lbp_indexes = find_similar_lbp_images(dataset, files.size, query_image)
+            similar_indexes = find_similar_images(dataset, files.size, query_image)
 
-            i = 1
-            while i < index.size and i <= count:
-                image = dataset[index[-i]]
-                image.show_image()
-                # image.show_lbp_image()
-                i += 1
+            print("\n-------------------------------------------")
+            print("\nThe closest images to \"{}\" according to only RGB distances (The closest image printed first).".format(query_image.get_filename()))
+            print_filenames(dataset, similar_rgb_indexes, count)
+            similarity_percentage_rgb = finding_similarity_percentage(dataset, query_image.get_filename(), similar_rgb_indexes, count)
+            print("The similarity percentage is %{:0.3f}".format(similarity_percentage_rgb))
+
+            print("\nThe closest images to \"{}\" according to only LBP distances (The closest image printed first).".format(query_image.get_filename()))
+            print_filenames(dataset, similar_lbp_indexes, count)
+            similarity_percentage_lbp = finding_similarity_percentage(dataset, query_image.get_filename(),similar_lbp_indexes, count)
+            print("The similarity percentage is %{:0.3f}".format(similarity_percentage_lbp))
+
+            print("\nThe closest images to \"{}\" according to both LBP and RGB (The closest image printed first).".format(query_image.get_filename()))
+            print_filenames(dataset, similar_indexes, count)
+            similarity_percentage_both = finding_similarity_percentage(dataset, query_image.get_filename(),similar_indexes, count)
+            print("The similarity percentage is %{:0.3f}".format(similarity_percentage_both))
 
             cv.waitKey(0)
             cv.destroyAllWindows()
