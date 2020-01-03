@@ -49,7 +49,12 @@ if __name__ == '__main__':
             similarity_percentage_both = finding_similarity_percentage(dataset, query_image.get_filename(),similar_indexes, count)
             print("The similarity percentage is %{:0.3f}".format(similarity_percentage_both))
 
+            dataset[similar_indexes[-1]].show_image()
+            query_image.show_image()
+
             cv.waitKey(0)
-            cv.destroyAllWindows()
+            cv.destroyWindow(dataset[similar_indexes[-1]].get_filename())
+            cv.destroyWindow(query_image.get_filename())
+
         else:
             print("invalid file path!")
